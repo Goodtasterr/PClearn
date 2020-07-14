@@ -124,58 +124,8 @@ def sort_train_test():
     print('train list:',train_npy, len(train_npy))
 
 if __name__ == '__main__':
-    root = '/home/hwq/dataset/raildatarename'
-    save_dir = '/home/hwq/dataset/labeled'
-    data_root = '/home/hwq/dataset/labeled/data'
-    label_root = '/home/hwq/dataset/labeled/label'
-    data_txt = '/home/hwq/dataset/labeled/datanpy'
-
-    import random
-
-
-
-    # print('list',index_list)
-    files = os.listdir(root)
-    files.sort()
-    fns = sorted(os.listdir(root))
-    # fns.sort()
-    print('fns',len(fns),fns,)
-
-    # for file in files:
-    #     file_name = file.split('.')[0]
-    #     file_npy = file_name+'.npy'
-    #     # file_txt = file_name+'.txt'
-    #     # print(file_txt)
-    #     pcd = o3d.io.read_point_cloud(os.path.join(root,file))
-    #
-    #     points = np.asarray(pcd.points)
-    #
-    #     points_new,index = pc_reduce(points,range)
-    #     new_data = np.concatenate((points,index[:, np.newaxis]),axis=-1)
-    #     # print(new_data[:10])
-    #     # np.save(os.path.join(data_txt,file_name),new_data)
-    #     data_npy = np.load(os.path.join(data_txt,file_npy))
-    #     # print(data_npy[:10])
-    #     # exit()
-    #
-    #
-    #     # print('index',type(index),index.shape)
-    #     # # print(new_data[16000:16020])
-    #     # # exit()
-    #     colors_list = data_npy[:,-1].astype(int)
-    #     # num_points = points_new.shape[0]
-    #     colors = pc_colors(colors_list)
-    #     # pcd.colors = o3d.utility.Vector3dVector(colors)
-    #     # print(colors.shape)
-    #     pcd_new = o3d.geometry.PointCloud()
-    #     pcd_new.points = o3d.utility.Vector3dVector(data_npy[:,:3])
-    #
-    #
-    #
-    #     pcd_new.colors = o3d.utility.Vector3dVector(colors)
-    #     # pcd.paint_uniform_color([0.5, 0.5, 0.5])
-    #     # pcd.colors[1500] = [1, 0, 0]
-    #     # o3d.io.write_point_cloud(os.path.join(save_dir,file), pcd_new)
-    #     o3d.visualization.draw_geometries([pcd_new],window_name='ranged',
-    #                                   width=800,height=600)
-    #     exit()
+    import torch
+    num_classes = 1
+    y = torch.tensor([0,0,0,0])
+    new_y = torch.eye(num_classes)[y,]
+    print(new_y,y.shape)

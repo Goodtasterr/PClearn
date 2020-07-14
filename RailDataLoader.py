@@ -42,7 +42,8 @@ class RailNormalDataset(Dataset):
         choice = np.random.choice(len(seg), self.npoints, replace=True)
         point_set = point_set[choice]
         seg = seg[choice]
-        return point_set, seg
+        cls = np.zeros([1,]).astype(np.int32)
+        return point_set,cls, seg
 
     def __len__(self):
         return len(self.datapath)
@@ -54,6 +55,6 @@ if __name__ == '__main__':
     train_dataloader = torch.utils.data.DataLoader(train_dataset,batch_size=bs)
     test_dataloader = torch.utils.data.DataLoader(test_dataset,batch_size=bs)
 
-    for point_set, seg_num in test_dataloader:
-        print((point_set)[0,:2,:1]*1e6)
+    for point_set,cls, seg_num in test_dataloader:
+        print((point_set).shape,cls.shape,seg_num.shape,seg_num.device)
         exit()

@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import torch
 
+
 def pc_normalize(pc):
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid
@@ -16,8 +17,8 @@ class RailNormalDataset(Dataset):
         self.npoints = npoints
 
         fns = sorted(os.listdir(root))
-        train_index = np.load('/home/hwq/dataset/labeled/trainindex.npy')
-        test_index = np.load('/home/hwq/dataset/labeled/testindex.npy')
+        train_index = np.load(os.path.join(root,'..')+'/trainindex.npy')
+        test_index = np.load(os.path.join(root,'..')+'/testindex.npy')
 
         alldatapath=[]
         for fn in fns:
@@ -36,25 +37,27 @@ class RailNormalDataset(Dataset):
         fn = self.datapath[item]
         data = np.load(fn).astype(np.float32)
         point_set = data[:,:3]
-        seg = data[:, -1].astype(np.int32)
+        seg = data[:, -1].astype(np.int64)
 
         point_set = pc_normalize(point_set)
         choice = np.random.choice(len(seg), self.npoints, replace=True)
         point_set = point_set[choice]
-        seg = seg[choice]
-        cls = np.zeros([1,]).astype(np.int32)
-        return point_set,cls, seg
+        seg = seg[choice]+1
+        # cls = np.zeros([1,]).astype(np.int32)
+        return point_set, seg
 
     def __len__(self):
         return len(self.datapath)
 
 if __name__ == '__main__':
     bs =5
+    root = '/home/hwq/dataset/labeled'
+    print(root+'/datanpy')
     train_dataset = RailNormalDataset(split='train')
     test_dataset = RailNormalDataset(split='test')
     train_dataloader = torch.utils.data.DataLoader(train_dataset,batch_size=bs)
     test_dataloader = torch.utils.data.DataLoader(test_dataset,batch_size=bs)
 
-    for point_set,cls, seg_num in test_dataloader:
-        print((point_set).shape,cls.shape,seg_num.shape,seg_num.device)
+    for point_set, seg_num in test_dataloader:
+        print((point_set)[0,:10],(seg_num.min()),seg_num.device)
         exit()

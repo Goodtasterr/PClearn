@@ -160,21 +160,28 @@ if __name__ == '__main__':
     range = [-5.5, -2.4, -1, 1, 6.5, 50] #下 上 左 右 前 后 max[-5.5, 7, -30, 30, 6.5, 70]
 
     #多目标 位置区间
+    end =35
+    endend = 55
     ranges = [[-5.5, -2.5, -1.3, 0.9, 6.5, 70],  #轨道
-              [-2,   7,  -10.5, -7, 6.5, 70],  #电线杆左
-              [1.3, 7, -7, 1.1, 6.5, 70],  #电线杆中
-              [-0.3, 7, 1.1, 4.6, 6.5, 43],  #电线杆右
-              [1.6, 7, -20, -10.5, 6.5, 70],  # 电线杆中
-              [-2, 7, -22, -20, 6.5, 70]  # 电线杆左
+              [-1.5,   7,  -6.5, -3.6, 6.5, 70],  #电线杆左
+              [1.3, 7, -3.6, 1.1, 6.5, 70],  #电线杆中
+              [-2, 7, 1.1, 3, 5, 70],  #电线杆右1
+
+              # [-2, 7, 1.1, 3.15, 55, 70],  # 电线杆右2
+
+              # [-1, 7, -20, -6.5, 6.5, end],  # 电线杆中5
+              # [-1, 7, -24, -1, 6.5, end],  # 电线杆左
+              # [-0.4, 7, -30, -6.5, end, 46]  # 电线杆左前
               ]
-    number = [1,2,2,2,2,2]
+    number = [1,2,2,2]
     ranges_np = np.asarray(ranges)
     number_np = np.asarray(number)
     number_np = number_np[:,np.newaxis]
     parameter = np.concatenate((ranges_np,number_np),axis=-1)
 
     for i,file in enumerate(files):
-        if i >50:
+        if i >691:
+            print('i =',i)
             file_name = file.split('.')[0]
             pcd = o3d.io.read_point_cloud(os.path.join(root,file))
             points = np.asarray(pcd.points)

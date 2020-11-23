@@ -20,9 +20,11 @@ parser.add_argument(
     '--workers', type=int, help='number of data loading workers', default=4)
 parser.add_argument(
     '--nepoch', type=int, default=25, help='number of epochs to train for')
-parser.add_argument('--outf', type=str, default='seg', help='output folder')
+parser.add_argument('--outf', type=str, default='seg2', help='output folder')
 parser.add_argument('--model', type=str, default='', help='model path')
-parser.add_argument('--dataset', type=str,  default='/home/hwq/dataset/labeled/datanpy',help="dataset path")
+parser.add_argument('--dataset', type=str,  default='/media/hwq/g/dataset/label2',help="dataset path")
+# parser.add_argument('--dataset', type=str,  default='/home/hwq/dataset/labeled/datanpy',help="dataset path")
+
 parser.add_argument('--class_choice', type=str, default='Chair', help="class_choice")
 parser.add_argument('--feature_transform', action='store_true', help="use feature transform")
 
@@ -55,7 +57,7 @@ test_dataloader = torch.utils.data.DataLoader(
     num_workers=int(opt.workers))
 
 print(len(train_dataset), len(test_dataset))
-num_classes = 2
+num_classes = 3
 
 try:
     os.makedirs(opt.outf)

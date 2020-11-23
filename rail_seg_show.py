@@ -6,13 +6,15 @@ import numpy as np
 import open3d   as o3d
 
 '''PATH'''
-weight_dir='./seg/seg_model_Chair_24.pth'
+weight_dir='./seg2/seg_model_Chair_24.pth'
 data_dir = ''
-root = '/home/hwq/dataset/labeled/datanpy'
-fns = sorted(os.listdir(root))
+root = '/media/hwq/g/datasets/label2'
+test_index = np.load(os.path.join(root,'..')+'/testindex.npy').tolist()
 
+fns = sorted(os.listdir(root))
+print(len(fns))
 '''MODEL'''
-classifier = PointNetDenseCls(k=2)
+classifier = PointNetDenseCls(k=3)
 weight = torch.load(weight_dir)
 classifier.load_state_dict(weight)
 classifier.cuda()
@@ -37,23 +39,25 @@ def pc_colors(arr):
 
     return np.asarray(colors)
 
-for file in fns[1800:]:
-    data = np.load(os.path.join(root,file)).astype(np.float32)
-    points = data[:,0:3]
-    points = pc_normalize(points)
-    points = points[np.newaxis,:,:]
-    points = torch.from_numpy(points).transpose(2,1).contiguous().cuda()
-    with torch.no_grad():
-        seg,_,_ = classifier(points)
+for i, file in enumerate(fns):
+    if i in test_index:
+        if i >100:
+            data = np.load(os.path.join(root,file)).astype(np.float32)
+            points = data[:,0:3]
+            points = pc_normalize(points)
+            points = points[np.newaxis,:,:]
+            points = torch.from_numpy(points).transpose(2,1).contiguous().cuda()
+            with torch.no_grad():
+                seg,_,_ = classifier(points)
+            print(seg.cpu().squeeze().shape)
+            label = torch.max(seg.cpu().squeeze(),-1)[1]
+            label= label.numpy()
 
-    label = torch.max(seg.cpu().squeeze(),-1)[1]
-    label= label.numpy()
-
-    colors = pc_colors(label)
-    pcd_new = o3d.geometry.PointCloud()
-    pcd_new.points = o3d.utility.Vector3dVector(data[:,0:3])
-    pcd_new.colors = o3d.utility.Vector3dVector(colors)
-    o3d.visualization.draw_geometries([pcd_new],window_name=file,
-                                  width=800,height=600)
+            colors = pc_colors(label)
+            pcd_new = o3d.geometry.PointCloud()
+            pcd_new.points = o3d.utility.Vector3dVector(data[:,0:3])
+            pcd_new.colors = o3d.utility.Vector3dVector(colors)
+            o3d.visualization.draw_geometries([pcd_new],window_name=file,
+                                          width=800,height=600)
 
     # exit()

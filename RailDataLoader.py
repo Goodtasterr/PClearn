@@ -2,7 +2,7 @@ import os
 from torch.utils.data import Dataset
 import numpy as np
 import torch
-
+from os.path import join
 
 def pc_normalize(pc):
     centroid = np.mean(pc, axis=0)
@@ -48,6 +48,50 @@ class RailNormalDataset(Dataset):
 
     def __len__(self):
         return len(self.datapath)
+
+class raildata_RandLA(Dataset):
+    def __int__(self,mode):
+        self.name = 'raildata_RandLA'
+        self.dataset_path = '/home/hwq/dataset/labeled/datanpy'
+        self.label_to_names = {0:'unlabeled',
+                               1:'rail',
+                               2:'pole'}
+        self.num_classes = len(self.label_to_names)
+        self.label_values = np.sort([k for k, v in self.label_to_names.items()]) # [0,1,2]
+        self.label_to_idx = {l: i for i, l in enumerate(self.label_values)} # dict {0:0,1:1,2:2}
+        self.ignored_labels = np.sort([0])
+
+        fns = sorted(os.listdir(root))
+        train_index = np.load(os.path.join(root,'..')+'/trainindex.npy')
+        test_index = np.load(os.path.join(root,'..')+'/testindex.npy')
+
+        alldatapath=[]
+        for fn in fns:
+            alldatapath.append(os.path.join(root,fn))
+
+        self.data_list=[]
+        if mode == 'train':
+            for index in train_index:
+                self.data_list.append(alldatapath[index])
+        if mode == 'test':
+            for index in test_index:
+                self.data_list.append(alldatapath[index])
+
+    def get_data(self, file_path):
+        seq_id = file_path.split('/')[-3]
+        frame_id = file_path.split('/')[-1][:-4]
+        kd_tree_path = join(self.dataset_path, seq_id, 'KDTree', frame_id + '.pkl')
+        # Read pkl with search tree
+        with open(kd_tree_path, 'rb') as f:
+            search_tree = pickle.load(f)
+        points = np.array(search_tree.data, copy=False)
+        # Load labels
+        if int(seq_id) >= 11: #11-21 is testing set
+            labels = np.zeros(np.shape(points)[0], dtype=np.uint8)
+        else:
+            label_path = join(self.dataset_path, seq_id, 'labels', frame_id + '.npy')
+            labels = np.squeeze(np.load(label_path))
+        return points, search_tree, labels
 
 if __name__ == '__main__':
     bs =5
